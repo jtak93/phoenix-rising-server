@@ -33,17 +33,9 @@ server.on('listening', onListening);
  * Install Socket.io
  */
 
- var io = require('socket.io')(server)
- console.log(io.sockets)
+ var io = require('socket.io').listen(server);
+ require('../sockets/base')(io);
 
- io.on('connection', function(socket) {
-   console.log('connected to', socket)
-   socket.on('user connected', function(id) {
-     console.log(`user id: ${id} connected`)
-     socket.emit('test', {hello: 'sup'})
-   })
-
- })
 
 /**
  * Normalize a port into a number, string, or false.
