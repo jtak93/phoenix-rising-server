@@ -4,7 +4,7 @@ var router = express.Router();
 var User = require('../models/user-model')
 
 router.post('/login', passport.authenticate('local'), function(req, res, next) {
-  res.send('logged in!')
+  res.send('attempting log in!')
 });
 
 router.post('/register', function(req, res) {
@@ -12,9 +12,10 @@ router.post('/register', function(req, res) {
     if (err) {
       res.send(err)
     }
-    console.log('user created:', user)
     passport.authenticate('local')(req, res, function () {
-      res.send('200', user)
+      console.log(req, res)
+      // if (!user.username) res.send('400', user)
+      res.send(user)
     });
   });
 });
