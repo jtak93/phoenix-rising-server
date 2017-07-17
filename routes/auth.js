@@ -4,7 +4,16 @@ var router = express.Router();
 var User = require('../models/user-model')
 
 router.post('/login', passport.authenticate('local'), function(req, res, next) {
-  res.send('attempting log in!')
+  var user = {
+    _id: req.user._id,
+    username: req.user.username,
+    email: req.user.email,
+    stats: req.user.stats,
+  }
+  res.status(200).send({
+    msg: 'logged in successfully',
+    user
+  })
 });
 
 router.post('/register', function(req, res) {
@@ -13,9 +22,20 @@ router.post('/register', function(req, res) {
       res.send(err)
     }
     passport.authenticate('local')(req, res, function () {
-      console.log(req, res)
-      // if (!user.username) res.send('400', user)
-      res.send(user)
+      var stats = {
+        weapon: {
+          type: 'bullet',
+          level: 1
+        },
+        abilities: [
+          { name: 'shield', duration: 2000, coolDownTimer: 0, coolDownDuration: 5000 }
+        ],
+        maxHealth: 10,
+        firingRateLevel: 1
+      }
+      User.findOneAndUpdate(req.user._id, {stats}, function(err, user) {
+        res.send(user)
+      })
     });
   });
 });

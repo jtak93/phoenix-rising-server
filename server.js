@@ -17,6 +17,7 @@ passport.deserializeUser(User.deserializeUser());
 var index = require('./routes/index');
 var users = require('./routes/users');
 var auth = require('./routes/auth');
+var sessions = require('./routes/session');
 
 var app = express();
 
@@ -49,6 +50,7 @@ app.use(cors())
 app.use('/', index);
 app.use('/auth', auth);
 app.use('/users', users);
+app.use('/sessions', sessions);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
