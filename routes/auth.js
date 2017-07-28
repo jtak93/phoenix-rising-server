@@ -17,11 +17,11 @@ router.post('/login', passport.authenticate('local'), function(req, res, next) {
 });
 
 router.post('/register', function(req, res) {
-  User.register(new User({ username : req.body.username, email: req.body.email }), req.body.password, function(err, user) {
-    if (err) {
-      res.send(err)
-    }
-    passport.authenticate('local')(req, res, function () {
+  // check for unique email
+  User.findOne({email: req.body.email}, function (err, user) {
+    if (user) {
+      res.status(409).send({message:'Email already in use'})
+    } else {
       var stats = {
         weapon: {
           type: 'bullet',
@@ -33,11 +33,23 @@ router.post('/register', function(req, res) {
         maxHealth: 10,
         firingRateLevel: 1
       }
-      User.findOneAndUpdate(req.user._id, {stats}, function(err, user) {
-        res.send(user)
+      User.register(new User({ username : req.body.username, email: req.body.email, stats: stats }), req.body.password, function(err, user) {
+        console.log(user)
+        if (err) res.status(409).send({message:'Username already in use'})
+        if (user) {
+          var userData = {
+            _id: user._id,
+            username: user.username,
+            stats: user.stats,
+            email: user.email,
+          }
+        }
+        passport.authenticate('local')(req, res, function () {
+          if (userData) res.status(201).send(userData)
+        });
       })
-    });
-  });
+    }
+  })
 });
 
 router.get('/logout', function(req, res) {
